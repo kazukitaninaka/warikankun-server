@@ -10,7 +10,14 @@ const app = async () => {
     resolvers: [EventResolver, PaymentResolver, ParticipantResolver],
   });
 
-  const server = new ApolloServer({ schema });
+  const server = new ApolloServer({
+    schema,
+    csrfPrevention: true, // see below for more about this
+    cache: "bounded",
+    cors: {
+      origin: ["http://localhost:3000", "https://warikankun.vercel.app"],
+    },
+  });
 
   server.listen().then(({ url }) => {
     console.log(`🚀  Server ready at ${url}`);
