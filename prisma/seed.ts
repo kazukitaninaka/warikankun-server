@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
@@ -26,7 +26,6 @@ async function main() {
   //       },
   //     ],
   //   });
-
   // const test = await prisma.payment.create({
   //   data: {
   //     eventId: '4d13f0e5-a25a-4537-9590-b6ec98cfc4ac',
@@ -42,7 +41,6 @@ async function main() {
   //     },
   //   },
   // });
-  console.log(test);
 }
 
 main()
