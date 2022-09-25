@@ -1,0 +1,4 @@
+# warikankun-server
+
+Serverside for https://github.com/kazukitaninaka/warikankun
+Built with Apollo Server, TypeScript, TypeGraphQL, Prisma
