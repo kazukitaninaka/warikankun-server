@@ -1,3 +1,4 @@
+import { PaymentsOnParticipants } from "@prisma/client";
 import {
   ObjectType,
   Field,
@@ -125,19 +126,19 @@ export class PaymentResolver {
 
   @FieldResolver()
   async whoShouldPay(@Root() payment: Payment): Promise<Participant[]> {
-    const participants = await prisma.paymentsOnParticipants.findMany({
-      where: {
-        paymentId: payment.id,
-      },
-    });
-    const whoShouldPay = await prisma.participant.findMany({
-      where: {
-        OR: participants.map((participant) => ({
-          id: participant.participantId,
-        })),
-      },
-    });
-    return whoShouldPay;
+    const whoShouldPay = await prisma.payment
+      .findUnique({
+        where: {
+          id: payment.id,
+        },
+      })
+      .whoShouldPay({
+        select: {
+          participant: true,
+        },
+      });
+
+    return whoShouldPay.map((el) => el.participant);
   }
 
   @FieldResolver()

@@ -157,19 +157,18 @@ let PaymentResolver = class PaymentResolver {
     }
     whoShouldPay(payment) {
         return __awaiter(this, void 0, void 0, function* () {
-            const participants = yield prisma_1.default.paymentsOnParticipants.findMany({
+            const whoShouldPay = yield prisma_1.default.payment
+                .findUnique({
                 where: {
-                    paymentId: payment.id,
+                    id: payment.id,
+                },
+            })
+                .whoShouldPay({
+                select: {
+                    participant: true,
                 },
             });
-            const whoShouldPay = yield prisma_1.default.participant.findMany({
-                where: {
-                    OR: participants.map((participant) => ({
-                        id: participant.participantId,
-                    })),
-                },
-            });
-            return whoShouldPay;
+            return whoShouldPay.map((el) => el.participant);
         });
     }
     whoPaid(payment) {
