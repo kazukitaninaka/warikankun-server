@@ -81,6 +81,12 @@ class DeletePaymentArgs {
   paymentId!: number;
 }
 
+@ObjectType()
+class getCountOutput {
+  @Field(() => Int!)
+  count!: number;
+}
+
 @Resolver(Payment)
 export class PaymentResolver {
   @Query(() => [Payment])
@@ -90,6 +96,16 @@ export class PaymentResolver {
         eventId,
       },
     });
+  }
+
+  @Query(() => getCountOutput)
+  async getCount(@Arg("eventId") eventId: string): Promise<{ count: number }> {
+    const count = await prisma.payment.count({
+      where: {
+        eventId,
+      },
+    });
+    return { count };
   }
 
   @Mutation(() => Payment)

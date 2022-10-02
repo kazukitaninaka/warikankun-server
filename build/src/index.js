@@ -9,6 +9,7 @@ const participants_1 = require("./participants");
 const type_graphql_1 = require("type-graphql");
 const schema = (0, type_graphql_1.buildSchemaSync)({
     resolvers: [events_1.EventResolver, payments_1.PaymentResolver, participants_1.ParticipantResolver],
+    emitSchemaFile: true,
 });
 const server = new apollo_server_cloud_functions_1.ApolloServer({
     schema,

@@ -119,6 +119,15 @@ __decorate([
 DeletePaymentArgs = __decorate([
     (0, type_graphql_1.ArgsType)()
 ], DeletePaymentArgs);
+let getCountOutput = class getCountOutput {
+};
+__decorate([
+    (0, type_graphql_1.Field)(() => type_graphql_1.Int),
+    __metadata("design:type", Number)
+], getCountOutput.prototype, "count", void 0);
+getCountOutput = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], getCountOutput);
 let PaymentResolver = class PaymentResolver {
     payments(eventId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -127,6 +136,16 @@ let PaymentResolver = class PaymentResolver {
                     eventId,
                 },
             });
+        });
+    }
+    getCount(eventId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const count = yield prisma_1.default.payment.count({
+                where: {
+                    eventId,
+                },
+            });
+            return { count };
         });
     }
     addPayment(addPaymentInput) {
@@ -191,6 +210,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PaymentResolver.prototype, "payments", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => getCountOutput),
+    __param(0, (0, type_graphql_1.Arg)("eventId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PaymentResolver.prototype, "getCount", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => Payment),
     __param(0, (0, type_graphql_1.Arg)("input")),
