@@ -14,5 +14,6 @@ const server = new apollo_server_cloud_functions_1.ApolloServer({
     schema,
     csrfPrevention: true,
     cache: "bounded",
+    introspection: true,
 });
 exports.handler = server.createHandler({});

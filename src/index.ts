@@ -13,6 +13,7 @@ const server = new ApolloServer({
   schema,
   csrfPrevention: true, // see below for more about this
   cache: "bounded",
+  introspection: true,
 });
 
 export const handler = server.createHandler({});
