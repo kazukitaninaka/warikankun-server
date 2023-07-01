@@ -47,7 +47,7 @@ __decorate([
     __metadata("design:type", participants_1.Participant)
 ], Payment.prototype, "whoPaid", void 0);
 __decorate([
-    (0, type_graphql_1.Field)(() => [participants_1.Participant], { nullable: true }),
+    (0, type_graphql_1.Field)(() => [WhoShouldPayOutput], { nullable: true }),
     __metadata("design:type", Array)
 ], Payment.prototype, "whoShouldPay", void 0);
 __decorate([
@@ -128,6 +128,15 @@ __decorate([
 getCountOutput = __decorate([
     (0, type_graphql_1.ObjectType)()
 ], getCountOutput);
+let WhoShouldPayOutput = class WhoShouldPayOutput extends participants_1.Participant {
+};
+__decorate([
+    (0, type_graphql_1.Field)(() => type_graphql_1.Float),
+    __metadata("design:type", Object)
+], WhoShouldPayOutput.prototype, "ratio", void 0);
+WhoShouldPayOutput = __decorate([
+    (0, type_graphql_1.ObjectType)()
+], WhoShouldPayOutput);
 let PaymentResolver = class PaymentResolver {
     payments(eventId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -136,6 +145,19 @@ let PaymentResolver = class PaymentResolver {
                     eventId,
                 },
             });
+        });
+    }
+    payment(paymentId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(paymentId);
+            const payment = yield prisma_1.default.payment.findUnique({
+                where: {
+                    id: paymentId,
+                },
+            });
+            if (!payment)
+                throw new Error("payment not found");
+            return payment;
         });
     }
     getCount(eventId) {
@@ -185,9 +207,16 @@ let PaymentResolver = class PaymentResolver {
                 .whoShouldPay({
                 select: {
                     participant: true,
+                    ratio: true,
                 },
             });
-            return whoShouldPay.map((el) => el.participant);
+            if (!whoShouldPay)
+                throw new Error("whoShouldPay not found");
+            const res = whoShouldPay.map((el) => {
+                return Object.assign(Object.assign({}, el.participant), { ratio: el.ratio });
+            });
+            console.log(res);
+            return res;
         });
     }
     whoPaid(payment) {
@@ -210,6 +239,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PaymentResolver.prototype, "payments", null);
+__decorate([
+    (0, type_graphql_1.Query)(() => Payment),
+    __param(0, (0, type_graphql_1.Arg)("paymentId")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], PaymentResolver.prototype, "payment", null);
 __decorate([
     (0, type_graphql_1.Query)(() => getCountOutput),
     __param(0, (0, type_graphql_1.Arg)("eventId")),

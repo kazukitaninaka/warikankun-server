@@ -32,8 +32,8 @@ export class Payment {
   @Field(() => Participant!, { nullable: true })
   whoPaid?: Participant;
 
-  @Field(() => [Participant!]!, { nullable: true })
-  whoShouldPay?: Participant[];
+  @Field(() => [WhoShouldPayOutput!]!, { nullable: true })
+  whoShouldPay?: WhoShouldPayOutput[];
 
   @Field(() => Int!)
   amount!: number;
@@ -87,6 +87,12 @@ class getCountOutput {
   count!: number;
 }
 
+@ObjectType()
+class WhoShouldPayOutput extends Participant {
+  @Field(() => Float)
+  ratio!: number | null;
+}
+
 @Resolver(Payment)
 export class PaymentResolver {
   @Query(() => [Payment])
@@ -96,6 +102,17 @@ export class PaymentResolver {
         eventId,
       },
     });
+  }
+  @Query(() => Payment)
+  async payment(@Arg("paymentId") paymentId: number): Promise<Payment> {
+    console.log(paymentId);
+    const payment = await prisma.payment.findUnique({
+      where: {
+        id: paymentId,
+      },
+    });
+    if (!payment) throw new Error("payment not found");
+    return payment;
   }
 
   @Query(() => getCountOutput)
@@ -141,7 +158,7 @@ export class PaymentResolver {
   }
 
   @FieldResolver()
-  async whoShouldPay(@Root() payment: Payment): Promise<Participant[]> {
+  async whoShouldPay(@Root() payment: Payment): Promise<WhoShouldPayOutput[]> {
     const whoShouldPay = await prisma.payment
       .findUnique({
         where: {
@@ -151,10 +168,20 @@ export class PaymentResolver {
       .whoShouldPay({
         select: {
           participant: true,
+          ratio: true,
         },
       });
+    if (!whoShouldPay) throw new Error("whoShouldPay not found");
 
-    return whoShouldPay.map((el) => el.participant);
+    const res = whoShouldPay.map((el) => {
+      return {
+        ...el.participant,
+        ratio: el.ratio,
+      };
+    });
+    console.log(res);
+
+    return res;
   }
 
   @FieldResolver()
