@@ -149,7 +149,6 @@ let PaymentResolver = class PaymentResolver {
     }
     payment(paymentId) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(paymentId);
             const payment = yield prisma_1.default.payment.findUnique({
                 where: {
                     id: paymentId,

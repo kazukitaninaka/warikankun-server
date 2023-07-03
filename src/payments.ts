@@ -105,7 +105,6 @@ export class PaymentResolver {
   }
   @Query(() => Payment)
   async payment(@Arg("paymentId") paymentId: number): Promise<Payment> {
-    console.log(paymentId);
     const payment = await prisma.payment.findUnique({
       where: {
         id: paymentId,
