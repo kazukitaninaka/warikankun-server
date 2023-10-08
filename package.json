@@ -6,7 +6,7 @@
   "scripts": {
     "start": "functions-framework --source=build/src/ --target=handler --port=4000",
     "watch": "concurrently \"tsc -w\" \"nodemon --watch ./build/ --exec pnpm start\"",
-    "deploy": "gcloud functions deploy warikankun-server --region=asia-northeast1 --entry-point handler --runtime nodejs16 --trigger-http --memory 128MB",
+    "deploy:gcp": "gcloud functions deploy warikankun-server --region=asia-northeast1 --entry-point handler --runtime nodejs20 --trigger-http --memory 128MB",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",
