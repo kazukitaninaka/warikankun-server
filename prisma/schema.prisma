@@ -54,4 +54,6 @@ model PaymentsOnParticipants {
   participant Participant @relation(fields: [participantId], references: [id])
   participantId Int
   ratio Float?
+
+  @@unique([paymentId, participantId])
 }

@@ -162,10 +162,10 @@ export class PaymentResolver {
   @Mutation(() => Payment)
   async updatePayment(
     @Arg("input") paymentInput: UpdatePaymentInput
-  ): Promise<{ id: number }> {
-    if (paymentInput.whoShouldPay) {
-      for (const participant of paymentInput.whoShouldPay) {
-        await prisma.paymentsOnParticipants.upsert({
+  ): Promise<Payment> {
+    const whoShouldPayMutations = paymentInput.whoShouldPay?.map(
+      (participant) => {
+        return prisma.paymentsOnParticipants.upsert({
           where: {
             paymentId_participantId: {
               paymentId: paymentInput.id,
@@ -182,7 +182,12 @@ export class PaymentResolver {
           },
         });
       }
-    }
+    );
+
+    await prisma.$transaction(whoShouldPayMutations ?? []).catch((err) => {
+      console.error(err);
+      throw err;
+    });
 
     const payment = await prisma.payment.update({
       where: {
