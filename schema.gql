@@ -41,6 +41,7 @@ type Mutation {
   addPayment(input: AddPaymentInput!): Payment!
   createEvent(input: EventInput!): Event!
   deletePayment(paymentId: Int!): Payment!
+  updatePayment(input: UpdatePaymentInput!): Payment!
 }
 
 type Participant {
@@ -67,7 +68,7 @@ type Payment {
   updatedAt: DateTime!
   whoPaid: Participant
   whoPaidId: Int!
-  whoShouldPay: [Participant!]
+  whoShouldPay: [WhoShouldPayOutput!]
 }
 
 type Query {
@@ -75,6 +76,7 @@ type Query {
   events: [Event!]!
   getCount(eventId: String!): getCountOutput!
   participants(eventId: String!): [Participant!]!
+  payment(paymentId: Float!): Payment!
   payments(eventId: String!): [Payment!]!
   result(eventId: String!): Result!
 }
@@ -97,9 +99,29 @@ type Transaction {
   to: [To!]!
 }
 
+input UpdatePaymentInput {
+  amount: Int
+  id: Int!
+  name: String
+  whoPaidId: Int
+  whoShouldPay: [WhoShouldPayInput!]
+}
+
 input WhoShouldPayInput {
   participantId: Int!
   ratio: Float!
+}
+
+type WhoShouldPayOutput {
+  createdAt: DateTime!
+  eventId: ID!
+  id: Int!
+  name: String!
+  participant: String
+  participantId: String
+  pictureUrl: String
+  ratio: Float!
+  updatedAt: DateTime!
 }
 
 type getCountOutput {

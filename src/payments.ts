@@ -74,6 +74,23 @@ export class AddPaymentInput {
   @Field(() => String!)
   eventId!: string;
 }
+@InputType()
+export class UpdatePaymentInput {
+  @Field(() => Int!)
+  id!: number;
+
+  @Field(() => String, { nullable: true })
+  name?: string;
+
+  @Field(() => Int, { nullable: true })
+  whoPaidId?: number;
+
+  @Field(() => [WhoShouldPayInput!], { nullable: true })
+  whoShouldPay?: WhoShouldPayInput[];
+
+  @Field(() => Int, { nullable: true })
+  amount?: number;
+}
 
 @ArgsType()
 class DeletePaymentArgs {
@@ -127,7 +144,7 @@ export class PaymentResolver {
   @Mutation(() => Payment)
   async addPayment(
     @Arg("input") addPaymentInput: AddPaymentInput
-  ): Promise<{ id: number }> {
+  ): Promise<Payment> {
     const payment = await prisma.payment.create({
       data: {
         eventId: addPaymentInput.eventId,
@@ -140,7 +157,50 @@ export class PaymentResolver {
       },
     });
 
-    return { id: payment.id };
+    return payment;
+  }
+  @Mutation(() => Payment)
+  async updatePayment(
+    @Arg("input") paymentInput: UpdatePaymentInput
+  ): Promise<Payment> {
+    const whoShouldPayMutations = paymentInput.whoShouldPay?.map(
+      (participant) => {
+        return prisma.paymentsOnParticipants.upsert({
+          where: {
+            paymentId_participantId: {
+              paymentId: paymentInput.id,
+              participantId: participant.participantId,
+            },
+          },
+          create: {
+            paymentId: paymentInput.id,
+            participantId: participant.participantId,
+            ratio: participant.ratio,
+          },
+          update: {
+            ratio: participant.ratio,
+          },
+        });
+      }
+    );
+
+    await prisma.$transaction(whoShouldPayMutations ?? []).catch((err) => {
+      console.error(err);
+      throw err;
+    });
+
+    const payment = await prisma.payment.update({
+      where: {
+        id: paymentInput.id,
+      },
+      data: {
+        whoPaidId: paymentInput.whoPaidId,
+        amount: paymentInput.amount,
+        name: paymentInput.name,
+      },
+    });
+
+    return payment;
   }
 
   @Mutation(() => Payment)
@@ -178,7 +238,6 @@ export class PaymentResolver {
         ratio: el.ratio,
       };
     });
-    console.log(res);
 
     return res;
   }
